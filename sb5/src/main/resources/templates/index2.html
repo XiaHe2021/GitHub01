@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common::header('布局')}">
+
+</head>
+<body class="easyui-layout">
+	<div data-options="region:'north',border:false" style="height:60px;background:#B3DFDA;padding:0px" ><img th:src="@{/images/logo.png}"></div>
+	<div data-options="region:'west',title:'West'"   th:href="@{/nav}" style="width:180px;padding:0px;"></div>
+	<div data-options="region:'east',title:'East'" style="width:180px;padding:0px;" > <div class="easyui-calendar" style="width: 180px;height: 180px" id="date"  ></div></div>
+	<div data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;">south region</div>
+	<div data-options="region:'center',title:'Center'" >
+		<div id="myTabs" class="easyui-tabs" style="width:700px;height:250px" data-options="fit:true"></div>
+	</div>
+
+
+</body>
+</html>

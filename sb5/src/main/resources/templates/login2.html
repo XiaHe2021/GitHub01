@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common::header('easyui1')}">
+</head>
+<body>
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">登录</h4>
+        </div>
+        <div class="modal-body">
+            <form id="form1">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">用户名：</label>
+                    <input name="username" type="text" class="form-control" id="exampleInputEmail1" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">密码：</label>
+                    <input name="password" type="password" class="form-control" id="exampleInputPassword1" placeholder="请输入密码">
+                </div>
+                <a  href="#" id="but1" class="btn btn-ok">登陆</a>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    //获取路径
+    var pathName = window.document.location.pathname;
+    //截取，得到项目名称
+    var ctx = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+          $("#but1").click(function () {
+                  $('#form1').form('submit',{
+                         url:ctx+"/user/Login2",
+                        onSubmit:function () {
+                         //    return false;
+                        },
+                        success:function (data) {
+                             alert(data);
+                            if(data == "error"){
+                                location.href="EmpAdd";
+                            }else{
+                                location.href=ctx+"/emp/";
+
+                            }
+                        }
+
+                  });
+
+          });
+</script>
+</body>
+</html>

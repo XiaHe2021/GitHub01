@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head  th:replace="~{common::header('主页')}">
+</head>
+<body>
+
+
+
+          <table  class="table table-bordered table-hover">
+              <thead>
+              <tr>
+                  <th>编号</th>
+                  <th>姓名</th>
+                  <th>岗位</th>
+                  <th>上级领导</th>
+                  <th>入职日期</th>
+                  <th>工资</th>
+                  <th>奖金</th>
+                  <th>部门</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="emp,start:${EmpAll}">
+                  <td style="display: none;">[[${emp.empno}]]</td>
+                  <td>[[${emp.ename}]]</td>
+                  <td>[[${emp.job}]]</td>
+                  <td>[[${emp.mgr}]]</td>
+                  <td>[[${#dates.format(emp.hiredate,'yyyy-MM-dd')}]]</td>
+                  <td>[[${#numbers.formatCurrency(emp.sal)}]]</td>
+                  <td>[[${#numbers.formatCurrency(emp.comm)}]]</td>
+                  <td>[[${emp.deptno}]]</td>
+                  <td><button type="button" class="btn btn-primary btn-lg"  th:onclick="|dele(${emp.empno})|">
+                      删除
+                  </button><button type="button" class="btn btn-primary btn-lg"  href="/EmpUpdate" >
+                      修改
+                  </button>
+
+                  </td>
+
+              </tr>
+             <button type="button" class="btn btn-primary btn-lg" id="list"  data-toggle="modal" data-target="#myModal" >
+              添加
+              </button>
+              <!-- Modal -->
+              <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                              <h4 class="modal-title" id="myModalLabel">添加员工</h4>
+                          </div>
+                          <div class="modal-body">
+                              <form th:action="@{/emp/AddEmp}" method="post">
+                                  <div class="form-group">
+                                      <label for="ename">姓名：</label>
+                                      <input name="ename" type="text" class="form-control" id="ename" placeholder="姓名">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="job">岗位：</label>
+                                      <input name="job" type="text" class="form-control" id="job" placeholder="岗位">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="mgr">上级领导：</label>
+                                      <input name="mgr" type="text" class="form-control" id="mgr" placeholder="上级领导">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="hiredate">入职日期：</label>
+                                      <input name="hiredate" type="date"  class="form-control" id="hiredate" placeholder="入职日期">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="sal">工资：</label>
+                                      <input name="sal" type="text" class="form-control" id="sal" placeholder="工资">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="comm">奖金：</label>
+                                      <input name="comm" type="text" class="form-control" id="comm" placeholder="奖金">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="deptno">部门：</label>
+                                      <select id="deptno">
+
+                                      </select>
+                                  </div>
+                                  <button type="submit" class="btn btn-ok">提交</button>
+                              </form>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              </tbody>
+          </table>
+          <script>
+              //获取路径
+              var pathName = window.document.location.pathname;
+              //截取，得到项目名称
+              var ctx = pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+              function  dele(id) {
+                  var  flg=confirm("确定要删除?");
+                  if(flg==true){
+                      location.href=ctx+"/emp/deleEmp?id="+id;
+                  }
+              }
+
+
+              $("#list").click(function () {
+                 $.ajax({
+                     url:ctx+"/emp/DeptAll",
+                     data:"get",
+                     dataType:"json",
+                     success:function(data) {
+                          $("#deptno").empty();
+                          for(var i=0;i<data.length;i++){
+                              var op=$("<option>").val(data[i].deptno).text(data[i].dname);
+                              $("#deptno").append(op);
+                          }
+                     }
+                 })
+              })
+
+          </script>
+
+</body>
+</html>

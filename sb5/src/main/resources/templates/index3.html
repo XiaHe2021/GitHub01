@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common::header('布局')}">
+</head>
+<body>
+<!--展示数据表格-->
+<table id="dataGrid"></table>
+<!--对话框-->
+<div id="dlg" class="easyui-dialog" style="width:400px;height:490px;padding:10px 20px"
+     closed="true" buttons="#dlg-buttons">
+    <!--<div class="ftitle"></div>-->
+    <form id="fm" method="post">
+        <div style="margin-bottom:20px;display:none" >
+            <input class="easyui-textbox" name="empno" style="width:100%"
+                   data-options="label:'编号:'">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="ename" style="width:100%"
+                   data-options="label:'姓名:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="job" style="width:100%"
+                   data-options="label:'岗位:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="mgr" style="width:100%"
+                   data-options="label:'上级领导:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-datebox" name="hiredate" style="width:100%"
+                   data-options="label:'入职日期:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="sal" style="width:100%"
+                   data-options="label:'工资:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="comm" style="width:100%"
+                   data-options="label:'奖金:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <select class="easyui-combobox" name="deptno" style="width:100%"
+                   data-options="label:'部门:',required:true,valueField:'deptno',textField:'dname',url:'emp/DeptAll',method:'get'">
+            </select>
+        </div>
+
+    </form>
+</div>
+<div id="dlg-buttons">
+    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveUser()">保存</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">返回</a>
+</div>
+<!--工具条-->
+<div id="tb" style="padding:5px;height:auto">
+    <div style="margin-bottom:5px">
+        <a style="float: left;" onclick="add()" href="#" class="easyui-linkbutton" iconCls="icon-add" text="添加" plain="true"></a>
+        <div class="datagrid-btn-separator"></div>
+        <a style="float: left;" href="#" class="easyui-linkbutton" iconCls="icon-edit" text="修改"  plain="true"></a>
+        <div class="datagrid-btn-separator"></div>
+        <a href="#" class="easyui-linkbutton" iconCls="icon-remove" text="删除"  plain="true"></a>
+    </div>
+    <div>
+        入职日期 从: <input class="easyui-datebox" style="width:80px">
+        到: <input class="easyui-datebox" style="width:80px">
+        姓名：
+        <input class="easyui-textbox" style="width:100px" textField="text">
+        部门:
+        <input class="easyui-combobox" style="width:100px"
+               url="data/combobox_data.json"
+               valueField="id" textField="text">
+        <a href="#" class="easyui-linkbutton" iconCls="icon-search">Search</a>
+    </div>
+</div>
+
+<script type="text/javascript" th:inline="none">
+
+    var url;
+        $('#dataGrid').datagrid({
+            url:'emp/page', //访问路径
+            method:"get", //提交类型
+            pagination:true,//分页
+            rownumbers:true,//显示行号
+            pageList:[5,10,15,20,25],//每页显示多少条的数字
+            fit:true,//自适应父容器
+            striped:true,//显示斑马线效果
+            columns:[[
+                {field:'ck',checkbox:true},
+                {field:"empno",title:'编号',width:100,hidden:true},
+                {field:'ename',title:'姓名',width:100},
+                {field:'job',title:'岗位',width:100},
+                {field:'mgr',title:'上级领导',width:100},
+                {field:'hiredate',title:'入职日期',width:100},
+                {field:'sal',title:'工资',width:100},
+                {field:'comm',title:'奖金',width:100},
+                {field:'deptno',title:'部门',width:100,formatter: function(value,row,index){
+                        if (row.dept){
+                            return row.dept.dname;
+                        } else {
+                            return value;
+                        }
+                    }
+                },
+            ]],
+            toolbar:"#tb",
+    //         toolbar: [{//工具栏
+    //             text:'添加',
+    //             iconCls: 'icon-add',
+    //             handler: function(){//要做的事情
+    //                 $('#dlg').dialog('open').dialog('setTitle','添加员工');
+    //                 $('#fm').form('clear');
+    //                 url = 'emp/AddEmp';
+    //             }
+    //         },'-',{
+    //             text:'修改',
+    //             iconCls: 'icon-edit',
+    //             handler: function(){
+    //                 var row = $('#dataGrid').datagrid('getSelected');
+    //                 //判断是否选中一行
+    //                 if (row){
+    //                     //打开对话框
+    //                     $('#dlg').dialog('open').dialog('setTitle','编辑员工');
+    //                     //往表单中加载选中的行对象
+    //                     $('#fm').form('load',row);c
+    //                     //设置修改的后台地址
+    //                     url = 'emp/update';
+    //                 }else{
+    //                     $.messager.alert('警告','请选择你要修改的行!','warning');
+    //                 }
+    //             }
+    //         },'-',{
+    //             text:'删除',
+    //             iconCls: 'icon-cancel',
+    //             handler: function(){
+    //                 // $("dataGrid").columns[[]]//列属性
+    //                 if($('#dataGrid').datagrid('getSelections').length>0) {
+    //                     var row = $("#dataGrid").datagrid("getSelections");//获取选中的行数组
+    //                     //定义ids，组装id
+    //                     var str = '';
+    //                     //拼接字符串
+    //                     for (var i = 0; i < row.length; i++) {
+    //                         str += row[i].empno;
+    //                         //只要不是最后一个，就加逗号
+    //                         if (i < row.length - 1) {
+    //                             str += ',';
+    //                         }
+    //                     }
+    //                     // url = "emp/delete/"+row.empno;
+    //                     url = "emp/deleBach?str=" + str;
+    //                     $.messager.confirm("警告", "确定要删除该员工记录?", function (r) {
+    //                         if (r) {
+    //                             $.ajax({
+    //                                 url: url,
+    //                                 type: 'get',
+    //                                 success: function (data) {
+    //                                     if (data == "success") {
+    //                                         $("#dataGrid").datagrid("reload");
+    //                                         $.messager.show({
+    //                                             title: "系统消息",
+    //                                             msg: "执行成功",
+    //                                             timeout: 2000,
+    //                                             showType: "slide"
+    //                                         });
+    //                                     }
+    //                                 },
+    //                                 error: function () {
+    //                                     $.messager.show({
+    //                                         title: '系统消息',
+    //                                         msg: '删除失败',
+    //                                         timeout: 3000,
+    //                                         showType: 'slide'
+    //                                     });
+    //                                 }
+    //                             })
+    //                         }
+    //                     });
+    //                 }else{
+    //                     $.messager.alert('警告','至少要选择一行!','warning');
+    //                 }
+    //             }
+    //         }]
+         })
+
+
+    function saveUser(){
+            alert(url)
+        $("#fm").form('submit',{
+             url:url,
+            type:'post',
+            onSubmit: function(){
+                return $(this).form('validate');
+            },
+            success:function (data) {
+
+                if(data=="success"){
+                    $("#dlg").dialog("close");
+                    $("#dataGrid").datagrid("reload");
+                    $.messager.show({
+                       title:"系统消息",
+                        msg:"更新成功",
+                        timeout:2000,
+                        showType:"slide"
+                    });
+                }else{
+                    alert(data);
+                    $.messager.show({
+                        title:"系统消息",
+                        msg:"更新失败",
+                        timeout:2000,
+                        showType:"slide"
+                    });
+                }
+            }
+
+        })
+    }
+     function add(){
+             $('#dlg').dialog('open').dialog('setTitle', '编辑员工');
+             //往表单中加载选中的行对象
+             $('#fm').form("clear");
+             url = 'emp/AddEmp';
+
+    }
+</script>
+</body>
+</html>
